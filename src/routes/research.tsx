@@ -22,7 +22,7 @@ const MODES = ["Short summary", "Detailed summary", "Beginner-friendly explanati
 function ResearchPage() {
   const [input, setInput] = useState("");
   const [instructions, setInstructions] = useState("");
-  const [mode, setMode] = useState(MODES[0]);
+  const [mode, setMode] = useState<string>(MODES[0]!);
   const ai = useAi();
 
   async function generate() {

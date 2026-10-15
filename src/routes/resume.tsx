@@ -37,13 +37,14 @@ function ResumePage() {
   const canNext = step !== 0 || (p.name.trim() && p.title.trim());
 
   async function genSummary() {
-    if (!s.experience.trim() && !s.target.trim()) return toast.error("Describe your experience or target role first.");
+    if (!s.experience.trim() && !s.target.trim()) return void toast.error("Describe your experience or target role first.");
     const t = await summaryAi.run("resume-summary", { name: p.name, title: p.title, ...s });
     if (t) setS((x) => ({ ...x, summary: t }));
   }
   async function improveJob(i: number) {
     const j = jobs[i];
-    if (!j.text.trim()) return toast.error("Add responsibilities first.");
+    if (!j) return;
+    if (!j.text.trim()) return void toast.error("Add responsibilities first.");
     setBusyIdx(i);
     const t = await jobAi.run("resume-experience", { role: j.role, company: j.company, text: j.text, target: s.target });
     setBusyIdx(null);
@@ -54,7 +55,7 @@ function ResumePage() {
   const md = buildMarkdown();
   function buildMarkdown() {
     const contact = [p.email, p.phone, p.location, p.links].filter(Boolean).join(" · ");
-    const lines = [`# ${p.name || "Your Name"}`, `**${p.title || "Professional title"}**`, contact, ""];
+    const lines: (string | false)[] = [`# ${p.name || "Your Name"}`, `**${p.title || "Professional title"}**`, contact, ""];
     if (s.summary) lines.push("## Professional summary", s.summary, "");
     const filled = jobs.filter((j) => j.role || j.company);
     if (filled.length) {
@@ -64,7 +65,7 @@ function ResumePage() {
     if (k.tech || k.soft) lines.push("## Skills", k.tech && `**Technical:** ${k.tech}`, k.soft && `**Soft skills:** ${k.soft}`, "");
     if (k.education) lines.push("## Education", k.education, "");
     if (k.certs) lines.push("## Certifications", k.certs, "");
-    return lines.filter((l) => l !== false && l !== undefined).join("\n\n").replace(/\n{3,}/g, "\n\n");
+    return lines.filter((l): l is string => typeof l === "string").join("\n\n").replace(/\n{3,}/g, "\n\n");
   }
 
   function finish() {
@@ -142,7 +143,7 @@ function ResumePage() {
           <Field label="Certifications" htmlFor="ce"><Textarea id="ce" rows={3} value={k.certs} onChange={(e) => setK({ ...k, certs: e.target.value })} /></Field>
           <div className="space-y-3 sm:col-span-2">
             <Field label="Job description (optional) — for keyword suggestions" htmlFor="jd"><Textarea id="jd" rows={4} value={jd} onChange={(e) => setJd(e.target.value)} maxLength={15000} /></Field>
-            <Button variant="outline" disabled={kwAi.loading} onClick={() => { if (!jd.trim()) return toast.error("Paste a job description first."); kwAi.run("resume-keywords", { target: s.target, resume: md, job: jd }); }}>
+            <Button variant="outline" disabled={kwAi.loading} onClick={() => { if (!jd.trim()) return void toast.error("Paste a job description first."); kwAi.run("resume-keywords", { target: s.target, resume: md, job: jd }); }}>
               {kwAi.loading ? <Loader2 className="animate-spin" /> : <Wand2 />} Suggest keywords
             </Button>
             {kwAi.error && <p className="text-sm text-destructive">{kwAi.error}</p>}

@@ -88,7 +88,7 @@ function PlannerPage() {
 
   function add(e: React.FormEvent) {
     e.preventDefault();
-    if (!f.name.trim()) return toast.error("Give the task a name.");
+    if (!f.name.trim()) return void toast.error("Give the task a name.");
     actions.addTask(f);
     setF(blank);
     toast.success("Task added");
@@ -96,7 +96,7 @@ function PlannerPage() {
 
   async function plan() {
     const open = tasks.filter((t) => !t.done);
-    if (!open.length) return toast.error("Add at least one open task first.");
+    if (!open.length) return void toast.error("Add at least one open task first.");
     const payload = JSON.stringify(open.map(({ name, description, priority, deadline, duration }) => ({ name, description, priority, deadline: deadline || "Not specified", duration: duration || "Not specified" })), null, 1);
     const t = await ai.run("planner", { tasks: payload, hours, constraints, today: t0 });
     if (t) actions.recordGeneration("plan", `Plan for ${open.length} tasks`);

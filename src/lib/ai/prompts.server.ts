@@ -1,7 +1,7 @@
 /**
  * Feature prompts. Each follows: Role → Task → Context → Constraints → Output format → Validation.
  */
-type P = Record<string, string | undefined>;
+type P = Partial<Record<""|"company"|"constraints"|"context"|"experience"|"goals"|"hours"|"input"|"instructions"|"job"|"length"|"mode"|"name"|"notes"|"participants"|"points"|"purpose"|"recipient"|"resume"|"role"|"subject"|"target"|"tasks"|"text"|"title"|"today"|"tone", string>>;
 const v = (s?: string) => (s && s.trim() ? s.trim() : "Not provided");
 
 const SHARED_RULES = `

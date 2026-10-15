@@ -25,7 +25,7 @@ export const runAi = createServerFn({ method: "POST" })
     const { buildPrompt } = await import("./ai/prompts.server");
     const { generate, friendlyAiError } = await import("./ai/gateway.server");
     try {
-      const { system, prompt } = buildPrompt(data.feature, data.data);
+      const { system, prompt } = buildPrompt(data.feature, data.data as Record<string, string>);
       const text = (await generate(system, prompt)).trim();
       if (!text) return { ok: false, error: "The AI returned an empty response. Please try again." };
       return { ok: true, text };
